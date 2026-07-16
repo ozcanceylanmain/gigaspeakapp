@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="tr" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-i18n-title>GigaSpeak — Dil Öğrenmenin Güçlü Hali</title>
+<meta name="description" content="14 dili kaslı bir maskotla öğren." data-i18n-desc>
+<link rel="icon" href="images/logo.webp" type="image/webp">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy-950:#050a14;
+    --navy-900:#0a1220;
+    --navy-800:#0f1a2e;
+    --navy-700:#172947;
+    --blue-500:#3b82f6;
+    --blue-400:#60a5fa;
+    --teal-400:#14b8a6;
+    --teal-300:#2dd4bf;
+    --gold-400:#fbbf24;
+    --ink-100:#f8fafc;
+    --ink-300:#cbd5e1;
+    --ink-500:#94a3b8;
+    --line:rgba(255,255,255,0.06);
+    --line-active:rgba(255,255,255,0.12);
+    --radius-lg:32px;
+    --radius-md:24px;
+    --radius-sm:16px;
+    --shadow-glow:0 0 40px -10px rgba(59,130,246,0.15), 0 20px 50px -12px rgba(0,0,0,0.5);
+    --ff-display:'Space Grotesk', 'Manrope', sans-serif;
+    --ff-body:'Manrope', sans-serif;
+    --transition-smooth:all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--navy-950);
+    color:var(--ink-100);
+    font-family:var(--ff-body);
+    overflow-x:hidden;
+    position:relative;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+  }
+
+  /* ---------- background ambience ---------- */
+  .bg-field{
+    position:fixed;
+    inset:0;
+    z-index:0;
+    pointer-events:none;
+    background:
+      radial-gradient(80% 60% at 15% 10%, rgba(59,130,246,0.18), transparent 50%),
+      radial-gradient(70% 50% at 85% 20%, rgba(45,212,191,0.12), transparent 50%),
+      radial-gradient(80% 60% at 50% 90%, rgba(59,130,246,0.08), transparent 50%),
+      var(--navy-950);
+  }
+  .spark{
+    position:absolute;
+    border-radius:50%;
+    background:var(--gold-400);
+    opacity:0.4;
+    filter:blur(0.5px);
+    box-shadow:0 0 12px 2px rgba(251,191,36,0.4);
+    animation:drift linear infinite;
+  }
+  @keyframes drift{
+    0%{transform:translateY(0) translateX(0) scale(1); opacity:0;}
+    10%{opacity:0.5;}
+    90%{opacity:0.4;}
+    100%{transform:translateY(-140vh) translateX(25px) scale(0.5); opacity:0;}
+  }
+
+  .wrap{max-width:1200px; margin:0 auto; padding:0 32px; position:relative; z-index:2;}
+
+  /* ---------- nav ---------- */
+  header{
+    position:fixed; top:0; left:0; right:0; z-index:50;
+    padding:20px 0;
+    backdrop-filter:blur(20px);
+    -webkit-backdrop-filter:blur(20px);
+    background:linear-gradient(to bottom, rgba(5,10,20,0.8), rgba(5,10,20,0));
+    border-bottom:1px solid transparent;
+    transition:var(--transition-smooth);
+  }
+  header.scrolled{
+    padding:14px 0;
+    background:rgba(5,10,20,0.85);
+    border-bottom:1px solid var(--line);
+    box-shadow:0 10px 30px -10px rgba(0,0,0,0.3);
+  }
+  .nav-inner{display:flex; align-items:center; justify-content:space-between; gap:16px;}
+  .brand{display:flex; align-items:center; gap:12px; font-family:var(--ff-display); font-weight:700; font-size:1.25rem; letter-spacing:-0.02em;}
+  .brand img{width:40px; height:40px; border-radius:12px; box-shadow:0 8px 20px rgba(59,130,246,0.25); transition:var(--transition-smooth);}
+  .brand:hover img{transform:rotate(-5deg) scale(1.05);}
+  .nav-actions{display:flex; align-items:center; gap:16px;}
+
+  .lang-select{
+    position:relative;
+  }
+  .lang-btn{
+    display:flex; align-items:center; gap:8px;
+    background:rgba(23,41,71,0.6);
+    border:1px solid var(--line);
+    color:var(--ink-100);
+    padding:10px 16px;
+    border-radius:999px;
+    font-family:var(--ff-body);
+    font-size:0.875rem;
+    font-weight:600;
+    cursor:pointer;
+    transition:var(--transition-smooth);
+  }
+  .lang-btn:hover{border-color:var(--blue-400); background:var(--navy-700);}
+  .lang-btn svg{width:12px; height:12px; transition:transform 0.3s ease;}
+  .lang-select.open .lang-btn svg{transform:rotate(180deg);}
+  
+  .lang-menu{
+    position:absolute;
+    top:calc(100% + 12px);
+    right:0;
+    width:220px;
+    max-height:350px;
+    overflow-y:auto;
+    background:rgba(15,26,46,0.95);
+    backdrop-filter:blur(16px);
+    -webkit-backdrop-filter:blur(16px);
+    border:1px solid var(--line-active);
+    border-radius:var(--radius-sm);
+    box-shadow:var(--shadow-glow);
+    padding:8px;
+    opacity:0;
+    transform:translateY(-12px) scale(0.95);
+    pointer-events:none;
+    transition:all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index:60;
+  }
+  .lang-select.open .lang-menu{opacity:1; transform:translateY(0) scale(1); pointer-events:auto;}
+  .lang-option{
+    display:flex; align-items:center; gap:12px;
+    padding:10px 12px;
+    border-radius:10px;
+    font-size:0.875rem;
+    font-weight:500;
+    color:var(--ink-300);
+    cursor:pointer;
+    transition:var(--transition-smooth);
+  }
+  .lang-option:hover{background:var(--navy-700); color:var(--ink-100); transform:translateX(4px);}
+  .lang-option.active{color:var(--teal-300); background:rgba(45,212,191,0.1); font-weight:600;}
+  .lang-option .flag{font-size:1.1rem; line-height:1;}
+
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:10px;
+    font-family:var(--ff-body);
+    font-weight:700;
+    font-size:0.95rem;
+    padding:14px 24px;
+    border-radius:999px;
+    border:none;
+    cursor:pointer;
+    text-decoration:none;
+    white-space:nowrap;
+    transition:var(--transition-smooth);
+  }
+  .btn-primary{
+    background:linear-gradient(135deg, var(--teal-300), var(--blue-500));
+    color:#050a14;
+    box-shadow:0 12px 30px -10px rgba(45,212,191,0.5);
+  }
+  .btn-primary:hover{
+    transform:translateY(-3px);
+    box-shadow:0 16px 36px -8px rgba(45,212,191,0.6);
+    filter:brightness(1.05);
+  }
+  .btn-primary:active{transform:translateY(-1px);}
+  .btn-ghost{
+    background:rgba(255,255,255,0.03);
+    color:var(--ink-100);
+    border:1px solid var(--line);
+  }
+  .btn-ghost:hover{border-color:var(--blue-400); background:rgba(96,165,250,0.1); transform:translateY(-2px);}
+  .btn-ghost:active{transform:translateY(0);}
+  .btn-sm{padding:10px 20px; font-size:0.85rem;}
+
+  header .btn-primary{display:inline-flex;}
+  @media (max-width:640px){
+    header .btn-primary span.long{display:none;}
+  }
+
+  /* ---------- hero ---------- */
+  .hero{
+    padding:200px 0 100px;
+    position:relative;
+  }
+  .hero-grid{
+    display:grid;
+    grid-template-columns:1.1fr 0.9fr;
+    gap:64px;
+    align-items:center;
+  }
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:var(--ff-display);
+    font-size:0.75rem;
+    font-weight:800;
+    letter-spacing:0.18em;
+    color:var(--teal-300);
+    background:rgba(45,212,191,0.08);
+    border:1px solid rgba(45,212,191,0.2);
+    padding:8px 16px 8px 12px;
+    border-radius:999px;
+    margin-bottom:28px;
+    text-transform:uppercase;
+  }
+  .eyebrow img{width:18px; height:18px; border-radius:6px;}
+  .hero h1{
+    font-family:var(--ff-display);
+    font-weight:700;
+    font-size:clamp(2.8rem, 5.8vw, 4.8rem);
+    line-height:1.05;
+    letter-spacing:-0.03em;
+    margin-bottom:28px;
+  }
+  .hero h1 .line2{
+    display:block;
+    background:linear-gradient(100deg, var(--teal-300) 10%, var(--blue-400) 90%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    filter:drop-shadow(0 2px 20px rgba(59,130,246,0.15));
+  }
+  .hero p.subtitle{
+    font-size:1.15rem;
+    line-height:1.7;
+    color:var(--ink-300);
+    max-width:520px;
+    margin-bottom:40px;
+  }
+  .hero-ctas{display:flex; align-items:center; gap:16px; flex-wrap:wrap; margin-bottom:60px;}
+  .btn-lg{padding:18px 32px; font-size:1.05rem;}
+  .btn-lg svg{width:22px; height:22px;}
+
+  .stats-row{display:flex; gap:48px; flex-wrap:wrap;}
+  .stat{display:flex; flex-direction:column; gap:4px;}
+  .stat-num{
+    font-family:var(--ff-display);
+    font-weight:700;
+    font-size:2.5rem;
+    background:linear-gradient(135deg, #ffffff, var(--ink-300));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    line-height:1;
+  }
+  .stat-label{font-size:0.85rem; color:var(--ink-500); font-weight:700; margin-top:4px; text-transform:uppercase; letter-spacing:0.05em;}
+
+  .hero-visual{
+    position:relative;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+  }
+  .logo-stage{
+    position:relative;
+    width:min(440px, 95%);
+    aspect-ratio:1/1;
+  }
+  .logo-ring{
+    position:absolute; inset:0;
+    border-radius:50%;
+    background:conic-gradient(from 120deg, rgba(45,212,191,0.4), rgba(59,130,246,0.4), rgba(251,191,36,0.3), rgba(45,212,191,0.4));
+    filter:blur(4px);
+    animation:spin 20s linear infinite;
+    opacity:0.8;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .logo-plate{
+    position:absolute;
+    inset:16px;
+    border-radius:50%;
+    background:radial-gradient(circle at 30% 30%, rgba(23,41,71,0.95), var(--navy-900) 80%);
+    border:1px solid var(--line-active);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:inset 0 0 50px rgba(0,0,0,0.6), var(--shadow-glow);
+    overflow:hidden;
+  }
+  .logo-plate img{width:76%; filter:drop-shadow(0 20px 45px rgba(0,0,0,0.6)); transition:var(--transition-smooth);}
+  .logo-stage:hover .logo-plate img{transform:scale(1.05) rotate(2deg);}
+  .logo-badge{
+    position:absolute;
+    display:flex; align-items:center; gap:8px;
+    background:rgba(15,26,46,0.85);
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+    border:1px solid var(--line-active);
+    border-radius:999px;
+    padding:10px 18px;
+    font-size:0.85rem;
+    font-weight:800;
+    font-family:var(--ff-display);
+    box-shadow:0 12px 28px -8px rgba(0,0,0,0.7);
+    animation:float 6s ease-in-out infinite;
+    transition:var(--transition-smooth);
+  }
+  .logo-badge:hover{transform:scale(1.1); background:var(--navy-700);}
+  .logo-badge.b1{top:6%; left:-4%; color:var(--teal-300); animation-delay:0s;}
+  .logo-badge.b2{bottom:12%; right:-6%; color:var(--gold-400); animation-delay:1.5s;}
+  .logo-badge.b3{bottom:-4%; left:12%; color:var(--blue-400); animation-delay:3s;}
+  @keyframes float{0%,100%{transform:translateY(0);} 50%{transform:translateY(-12px);}}
+
+  /* ---------- fun scene sections ---------- */
+  .scene{
+    padding:80px 0;
+    position:relative;
+  }
+  .scene-frame{
+    position:relative;
+    border-radius:var(--radius-lg);
+    overflow:hidden;
+    border:1px solid var(--line);
+    box-shadow:var(--shadow-glow);
+    background:var(--navy-900);
+    transition:var(--transition-smooth);
+  }
+  .scene-frame:hover{border-color:var(--line-active); transform:translateY(-4px);}
+  .scene-frame img{
+    width:100%;
+    display:block;
+    aspect-ratio:2.2/1;
+    object-fit:cover;
+    object-position:center 25%;
+    transition:transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .scene-frame:hover img{transform:scale(1.03);}
+  .scene-caption{
+    position:absolute;
+    left:0; right:0; bottom:0;
+    padding:40px clamp(24px, 6vw, 64px) 32px;
+    background:linear-gradient(to top, rgba(5,10,20,0.96), rgba(5,10,20,0.6) 50%, transparent);
+  }
+  .scene-caption h3{
+    font-family:var(--ff-display);
+    font-size:clamp(1.4rem, 2.8vw, 2.2rem);
+    font-weight:700;
+    margin-bottom:8px;
+    letter-spacing:-0.01em;
+  }
+  .scene-caption p{
+    color:var(--ink-300);
+    font-size:1rem;
+    max-width:560px;
+  }
+
+  /* ---------- features ---------- */
+  .features{padding:120px 0 80px;}
+  .section-head{max-width:680px; margin-bottom:80px;}
+  .section-head h2{
+    font-family:var(--ff-display);
+    font-weight:700;
+    font-size:clamp(2.2rem, 4vw, 3.2rem);
+    letter-spacing:-0.02em;
+    margin-top:18px;
+    line-height:1.15;
+  }
+
+  .feature-row{
+    display:grid;
+    grid-template-columns:1fr 1.1fr;
+    gap:80px;
+    align-items:center;
+    padding:80px 0;
+    border-top:1px solid var(--line);
+  }
+  .feature-row:last-child{padding-bottom:0;}
+  .feature-row.reverse .feature-copy{order:2;}
+  .feature-row.reverse .feature-shot{order:1;}
+
+  .feature-tag{
+    display:inline-block;
+    font-family:var(--ff-display);
+    font-size:0.75rem;
+    font-weight:800;
+    letter-spacing:0.16em;
+    color:var(--gold-400);
+    margin-bottom:16px;
+    text-transform:uppercase;
+  }
+  .feature-copy h3{
+    font-family:var(--ff-display);
+    font-size:clamp(1.6rem, 2.6vw, 2.2rem);
+    font-weight:700;
+    line-height:1.25;
+    margin-bottom:20px;
+    letter-spacing:-0.02em;
+  }
+  .feature-copy p{
+    color:var(--ink-300);
+    font-size:1.05rem;
+    line-height:1.7;
+    max-width:440px;
+  }
+
+  .feature-shot{
+    display:flex;
+    justify-content:center;
+    position:relative;
+  }
+  .phone-frame{
+    position:relative;
+    width:min(280px, 80%);
+    border-radius:40px;
+    overflow:hidden;
+    border:1px solid var(--line-active);
+    box-shadow:var(--shadow-glow), 0 0 0 4px rgba(255,255,255,0.02);
+    background:var(--navy-800);
+    transform:rotate(var(--tilt, 0deg));
+    transition:all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .phone-frame::after{
+    content:'';
+    position:absolute;
+    inset:0;
+    border-radius:40px;
+    box-shadow:inset 0 0 20px rgba(255,255,255,0.05);
+    pointer-events:none;
+  }
+  .phone-frame:hover{
+    transform:rotate(0deg) translateY(-10px) scale(1.02);
+    box-shadow:0 30px 60px -15px rgba(59,130,246,0.25);
+    border-color:var(--blue-400);
+  }
+  .phone-frame img{width:100%; display:block;}
+  .scene-frame picture, .phone-frame picture{display:block; width:100%; height:100%;}
+  .feature-row:nth-child(odd) .phone-frame{--tilt:-3deg;}
+  .feature-row:nth-child(even) .phone-frame{--tilt:3deg;}
+
+  .reveal{
+    opacity:0;
+    transform:translateY(40px);
+    transition:opacity .8s cubic-bezier(.16,1,.3,1), transform .8s cubic-bezier(.16,1,.3,1);
+  }
+  .reveal.in{opacity:1; transform:translateY(0);}
+
+  /* ---------- language roster ---------- */
+  .languages{padding:100px 0 110px;}
+  .lang-grid{
+    display:grid;
+    grid-template-columns:repeat(7, 1fr);
+    gap:16px;
+    margin-top:54px;
+  }
+  .lang-chip{
+    display:flex; flex-direction:column; align-items:center; gap:12px;
+    background:rgba(15,26,46,0.5);
+    border:1px solid var(--line);
+    border-radius:var(--radius-sm);
+    padding:24px 12px;
+    transition:var(--transition-smooth);
+    cursor:pointer;
+  }
+  .lang-chip:hover{
+    transform:translateY(-6px);
+    border-color:var(--teal-300);
+    background:var(--navy-800);
+    box-shadow:0 12px 24px -10px rgba(45,212,191,0.2);
+  }
+  .lang-chip .flag{font-size:2.2rem; line-height:1; filter:drop-shadow(0 4px 8px rgba(0,0,0,0.15));}
+  .lang-chip .code{font-size:0.75rem; font-weight:800; color:var(--ink-500); letter-spacing:0.1em; text-transform:uppercase;}
+
+  @media (max-width:900px){.lang-grid{grid-template-columns:repeat(4, 1fr);}}
+  @media (max-width:520px){.lang-grid{grid-template-columns:repeat(3, 1fr);}}
+
+  /* ---------- bottom CTA ---------- */
+  .cta-bottom{padding:60px 0 100px;}
+  .cta-card{
+    position:relative;
+    border-radius:var(--radius-lg);
+    padding:clamp(48px, 8vw, 88px);
+    text-align:center;
+    background:
+      radial-gradient(80% 100% at 50% 0%, rgba(45,212,191,0.22), transparent 70%),
+      linear-gradient(160deg, var(--navy-800), var(--navy-900));
+    border:1px solid var(--line-active);
+    overflow:hidden;
+    box-shadow:var(--shadow-glow);
+  }
+  .cta-card::before{
+    content:"";
+    position:absolute;
+    width:400px; height:400px;
+    background:radial-gradient(circle, rgba(59,130,246,0.3), transparent 70%);
+    top:-180px; right:-120px;
+    filter:blur(20px);
+    pointer-events:none;
+  }
+  .cta-card h2{
+    font-family:var(--ff-display);
+    font-weight:700;
+    font-size:clamp(2.2rem, 5vw, 3.2rem);
+    letter-spacing:-0.02em;
+    margin-bottom:18px;
+    position:relative;
+    line-height:1.15;
+  }
+  .cta-card p{
+    color:var(--ink-300);
+    font-size:1.15rem;
+    margin-bottom:40px;
+    position:relative;
+  }
+
+  /* ---------- footer ---------- */
+  footer{
+    padding:44px 0;
+    border-top:1px solid var(--line);
+    background:rgba(5,10,20,0.4);
+  }
+  .footer-inner{
+    display:flex; align-items:center; justify-content:space-between;
+    flex-wrap:wrap; gap:24px;
+  }
+  .footer-brand{display:flex; align-items:center; gap:12px; font-family:var(--ff-display); font-weight:700;}
+  .footer-brand img{width:32px; height:32px; border-radius:8px;}
+  .footer-tagline{color:var(--ink-500); font-size:0.9rem; font-weight:500;}
+  .footer-copy{color:var(--ink-500); font-size:0.85rem;}
+
+  /* ---------- responsive ---------- */
+  @media (max-width:960px) {
+    .hero-grid{grid-template-columns:1fr; gap:64px; text-align:center;}
+    .hero{padding-top:160px; padding-bottom:60px;}
+    .hero-visual{order:-1;}
+    .logo-stage{width:min(320px, 75%); margin:0 auto;}
+    .hero-ctas{justify-content:center;}
+    .stats-row{justify-content:center; gap:36px;}
+    .feature-row{grid-template-columns:1fr; gap:40px; text-align:center;}
+    .feature-row.reverse .feature-copy{order:1;}
+    .feature-row.reverse .feature-shot{order:2;}
+    .feature-copy p{max-width:100%; margin:0 auto;}
+    .feature-shot{margin-top:20px;}
+    .section-head{text-align:center; margin:0 auto 60px;}
+  }
+  @media (max-width:600px){
+    .wrap{padding:0 24px;}
+    .stats-row{gap:32px;}
+    .stat-num{font-size:2rem;}
+    .scene-frame img{aspect-ratio:1.5/1; object-position:center 15%;}
+    .nav-actions .btn-sm span.long{display:none;}
+  }
+
+  [dir="rtl"] .lang-menu{right:auto; left:0;}
+  [dir="rtl"] .stats-row{direction:ltr; justify-content:flex-start;}
+</style>
+</head>
+<body>
+
+<div class="bg-field" id="bgField"></div>
+
+<header id="siteHeader">
+  <div class="wrap nav-inner">
+    <div class="brand">
+      <img src="images/logo.webp" alt="GigaSpeak logo">
+      <span>GigaSpeak</span>
+    </div>
+    <div class="nav-actions">
+      <div class="lang-select" id="langSelect">
+        <button class="lang-btn" id="langBtn" type="button" aria-haspopup="listbox" aria-expanded="false">
+          <span class="flag" id="langBtnFlag">🇹🇷</span>
+          <span id="langBtnCode">TR</span>
+          <svg viewBox="0 0 12 8" fill="none"><path d="M1 1L6 6L11 1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="lang-menu" id="langMenu" role="listbox"></div>
+      </div>
+      <a class="btn btn-primary btn-sm" href="https://play.google.com/store/apps/details?id=com.gigaspeak.app" target="_blank" rel="noopener">
+        <span data-i18n="nav.cta">Ücretsiz İndir</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div class="hero-copy reveal in">
+        <div class="eyebrow"><img src="images/logo.webp" alt=""><span data-i18n="hero.eyebrow">GIGASPEAK</span></div>
+        <h1>
+          <span data-i18n="hero.title_line1">Dil öğrenmek</span>
+          <span class="line2" data-i18n="hero.title_line2">artık güç işi.</span>
+        </h1>
+        <p class="subtitle" data-i18n="hero.subtitle">Kaslı maskotumuzla İngilizce'den Korece'ye 14 dili öğren. Kelime ezberleme, gerçekten konuş.</p>
+        <div class="hero-ctas">
+          <a class="btn btn-primary btn-lg" href="https://play.google.com/store/apps/details?id=com.gigaspeak.app" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M3.6 2.4c-.4.3-.6.8-.6 1.4v16.4c0 .6.2 1.1.6 1.4l.1.1L13 12.2v-.4L3.7 2.3l-.1.1z" fill="#00D3FF"/><path d="M16.1 15.3l-3.1-3.1v-.4l3.1-3.1 3.5 2c1 .6 1 1.5 0 2.1l-3.5 2z" fill="#FFCE00"/><path d="M16.1 15.3L13 12.2 3.6 21.6c.4.4 1 .4 1.7.1l10.8-6.4z" fill="#FF3A44"/><path d="M16.1 8.7L5.3 2.3c-.7-.4-1.3-.3-1.7.1L13 12l3.1-3.3z" fill="#00F076"/></svg>
+            <span data-i18n="hero.cta_primary">Google Play'den İndir</span>
+          </a>
+          <a class="btn btn-ghost btn-lg" href="#features">
+            <span data-i18n="hero.cta_secondary">Nasıl çalışıyor?</span>
+          </a>
+        </div>
+        <div class="stats-row">
+          <div class="stat">
+            <span class="stat-num" data-i18n="hero.stat1_number">14</span>
+            <span class="stat-label" data-i18n="hero.stat1_label">Desteklenen Dil</span>
+          </div>
+          <div class="stat">
+            <span class="stat-num" data-i18n="hero.stat2_number">60</span>
+            <span class="stat-label" data-i18n="hero.stat2_label">Günlük Müfredat</span>
+          </div>
+          <div class="stat">
+            <span class="stat-num" data-i18n="hero.stat3_number">0₺</span>
+            <span class="stat-label" data-i18n="hero.stat3_label">Başlangıç Ücreti</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-visual reveal in">
+        <div class="logo-stage">
+          <div class="logo-ring"></div>
+          <div class="logo-plate"><img src="images/logo.webp" alt="GigaSpeak maskot"></div>
+          <div class="logo-badge b1">🔥 XP</div>
+          <div class="logo-badge b2">🏆 Bronze</div>
+          <div class="logo-badge b3">💬 14 Dil</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FUN SCENE 1 -->
+  <section class="scene">
+    <div class="wrap">
+      <div class="scene-frame reveal">
+        <picture><source srcset="images/fun1.webp" type="image/webp"><img src="images/fun1.png" alt="GigaSpeak ailesi" loading="lazy"></picture>
+        <div class="scene-caption">
+          <h3 data-i18n="scene1.caption">GigaSpeak ailesi büyüyor</h3>
+          <p data-i18n="scene1.tagline">Her yaştan kullanıcı, her gün pratik yapıyor.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features" id="features">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div class="eyebrow"><span data-i18n="features.eyebrow">ÖZELLİKLER</span></div>
+        <h2 data-i18n="features.title">Her ekran bir antrenman.</h2>
+      </div>
+
+      <div class="feature-row reveal">
+        <div class="feature-copy">
+          <span class="feature-tag" data-i18n="features.f1.tag">14 DİL</span>
+          <h3 data-i18n="features.f1.title">Global Öğrenme Gücü</h3>
+          <p data-i18n="features.f1.text">Türkçe, İngilizce, Almanca, Fransızca, Arapça, Rusça, Çince ve daha fazlası. Tek uygulama, sınırsız dil.</p>
+        </div>
+        <div class="feature-shot">
+          <div class="phone-frame"><picture><source srcset="images/screen1.webp" type="image/webp"><img src="images/screen1.png" alt="Dil seçimi ekranı" loading="lazy"></picture></div>
+        </div>
+      </div>
+
+      <div class="feature-row reverse reveal">
+        <div class="feature-copy">
+          <span class="feature-tag" data-i18n="features.f2.tag">İLERLEME</span>
+          <h3 data-i18n="features.f2.title">Gücünü Gör, Adımını Takip Et</h3>
+          <p data-i18n="features.f2.text">Günlük seri, XP puanları, kelime hazinen ve kurs kilometre taşların — hepsi tek ekranda.</p>
+        </div>
+        <div class="feature-shot">
+          <div class="phone-frame"><picture><source srcset="images/screen2.webp" type="image/webp"><img src="images/screen2.png" alt="İlerleme ekranı" loading="lazy"></picture></div>
+        </div>
+      </div>
+
+      <div class="feature-row reveal">
+        <div class="feature-copy">
+          <span class="feature-tag" data-i18n="features.f3.tag">MODÜLLER</span>
+          <h3 data-i18n="features.f3.title">Modülünü Seç, Antrenmana Başla</h3>
+          <p data-i18n="features.f3.text">Alfabe, kelime, gramer ve ileri seviye pratik. Her modül anında geri bildirimle seni bekliyor.</p>
+        </div>
+        <div class="feature-shot">
+          <div class="phone-frame"><picture><source srcset="images/screen3.webp" type="image/webp"><img src="images/screen3.png" alt="Modül seçim ekranı" loading="lazy"></picture></div>
+        </div>
+      </div>
+
+      <div class="feature-row reverse reveal">
+        <div class="feature-copy">
+          <span class="feature-tag" data-i18n="features.f4.tag">TELAFFUZ</span>
+          <h3 data-i18n="features.f4.title">Dinle, Öğren, Net Konuş</h3>
+          <p data-i18n="features.f4.text">Gerçek dünya sesleriyle telaffuz pratiği yap. Sesini kaydet, akıcılığını takip et.</p>
+        </div>
+        <div class="feature-shot">
+          <div class="phone-frame"><picture><source srcset="images/screen4.webp" type="image/webp"><img src="images/screen4.png" alt="Telaffuz ekranı" loading="lazy"></picture></div>
+        </div>
+      </div>
+
+      <div class="feature-row reveal">
+        <div class="feature-copy">
+          <span class="feature-tag" data-i18n="features.f5.tag">SINAV</span>
+          <h3 data-i18n="features.f5.title">Anlamları Gör, Kendini Sına</h3>
+          <p data-i18n="features.f5.text">İnteraktif sınavlarla kelime hazineni test et. Anında geri bildirim, anında öğrenme.</p>
+        </div>
+        <div class="feature-shot">
+          <div class="phone-frame"><picture><source srcset="images/screen5.webp" type="image/webp"><img src="images/screen5.png" alt="Sınav ekranı" loading="lazy"></picture></div>
+        </div>
+      </div>
+
+      <div class="feature-row reverse reveal">
+        <div class="feature-copy">
+          <span class="feature-tag" data-i18n="features.f6.tag">KONUŞMA</span>
+          <h3 data-i18n="features.f6.title">Konuşmaya Odaklan</h3>
+          <p data-i18n="features.f6.text">Sürükleyici sesli derslerle telaffuzunu ustalaştır. Konuşma tanıma ve aksan koçluğu seninle.</p>
+        </div>
+        <div class="feature-shot">
+          <div class="phone-frame"><picture><source srcset="images/screen6.webp" type="image/webp"><img src="images/screen6.png" alt="Konuşma pratiği ekranı" loading="lazy"></picture></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FUN SCENE 2 -->
+  <section class="scene">
+    <div class="wrap">
+      <div class="scene-frame reveal">
+        <picture><source srcset="images/fun2.webp" type="image/webp"><img src="images/fun2.png" alt="Geçmiş zaman öğrenimi" loading="lazy"></picture>
+        <div class="scene-caption">
+          <h3 data-i18n="scene2.caption">Ben gittim, ben yedim, ben oynadım!</h3>
+          <p data-i18n="scene2.tagline">Geçmiş zaman mı? GigaSpeak ile çocuk oyuncağı.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LANGUAGE ROSTER -->
+  <section class="languages">
+    <div class="wrap">
+      <div class="section-head reveal" style="margin-bottom:0;">
+        <div class="eyebrow"><span data-i18n="languages.eyebrow">DİL KADROSU</span></div>
+        <h2 data-i18n="languages.title">14 dil, tek antrenman planı.</h2>
+      </div>
+      <div class="lang-grid reveal" id="langGrid"></div>
+    </div>
+  </section>
+
+  <!-- FUN SCENE 3 -->
+  <section class="scene">
+    <div class="wrap">
+      <div class="scene-frame reveal">
+        <picture>
+          <source srcset="images/fun3.webp" type="image/webp">
+          <img src="images/fun3.png" alt="Rahat bir gün" loading="lazy">
+        </picture>
+        <div class="scene-caption">
+          <h3 data-i18n="scene3.caption">Evde bile antrenman devam ediyor</h3>
+          <p data-i18n="scene3.tagline">Kanepede otururken bile kelime hazineni büyüt.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BOTTOM CTA -->
+  <section class="cta-bottom">
+    <div class="wrap">
+      <div class="cta-card reveal">
+        <h2 data-i18n="cta_bottom.title">Kaslarını konuşturmaya hazır mısın?</h2>
+        <p data-i18n="cta_bottom.subtitle">Ücretsiz indir, ilk dersine bugün başla.</p>
+        <a class="btn btn-primary btn-lg" href="https://play.google.com/store/apps/details?id=com.gigaspeak.app" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M3.6 2.4c-.4.3-.6.8-.6 1.4v16.4c0 .6.2 1.1.6 1.4l.1.1L13 12.2v-.4L3.7 2.3l-.1.1z" fill="#00D3FF"/><path d="M16.1 15.3l-3.1-3.1v-.4l3.1-3.1 3.5 2c1 .6 1 1.5 0 2.1l-3.5 2z" fill="#FFCE00"/><path d="M16.1 15.3L13 12.2 3.6 21.6c.4.4 1 .4 1.7.1l10.8-6.4z" fill="#FF3A44"/><path d="M16.1 8.7L5.3 2.3c-.7-.4-1.3-.3-1.7.1L13 12l3.1-3.3z" fill="#00F076"/></svg>
+          <span data-i18n="cta_bottom.cta">Google Play'den İndir</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap footer-inner">
+    <div class="footer-brand">
+      <img src="images/logo.webp" alt="GigaSpeak logo">
+      <span>GigaSpeak</span>
+    </div>
+    <div class="footer-tagline" data-i18n="footer.tagline">GigaSpeak — Dil öğrenmenin güçlü hali.</div>
+    <div class="footer-copy" data-i18n="footer.copyright">© 2026 GigaSpeak. Tüm hakları saklıdır.</div>
+  </div>
+</footer>
+
+<script src="translations.js"></script>
+<script src="i18n.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
